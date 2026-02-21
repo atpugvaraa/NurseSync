@@ -24,21 +24,15 @@ export default function TaskManagerView() {
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="rounded-2xl border border-teal-100 bg-white px-3 py-3">
             <p className="text-3xl font-black text-slate-900">{urgentCount}</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-teal-700">
-              Urgent
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-teal-700">Urgent</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
             <p className="text-3xl font-black text-slate-600">12</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Today
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Today</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
             <p className="text-3xl font-black text-slate-600">84%</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Stats
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Stats</p>
           </div>
         </div>
       </section>
@@ -50,17 +44,11 @@ export default function TaskManagerView() {
 
       <section className="mt-3 space-y-3">
         {tasks.map((task) => (
-          <article
-            key={task.id}
-            className="card border-l-4 border-l-teal-500 p-4"
-          >
+          <article key={task.id} className="card border-l-4 border-l-teal-500 p-4">
             <p className="text-sm font-black text-rose-500">
-              {task.completed ? "Completed" : `${task.overdueMinutes}m Overdue`}{" "}
-              • ROOM {task.room}
+              {task.completed ? "Completed" : `${task.overdueMinutes}m Overdue`} • {task.ward.toUpperCase()}
             </p>
-            <h2 className="mt-1 text-3xl font-black leading-tight text-slate-900">
-              {task.title}
-            </h2>
+            <h2 className="mt-1 text-3xl font-black leading-tight text-slate-900">{task.title}</h2>
             <div className="mt-4 flex gap-2">
               <button
                 type="button"

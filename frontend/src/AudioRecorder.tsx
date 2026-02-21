@@ -1,19 +1,17 @@
-import { useState, useRef, useCallback } from "react";
-import axios from "axios";
-
-const BASE_URL = "http://localhost:8000";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createLogFromAudio } from "./api/client";
+import type { CreateLogResponse } from "./api/types";
 
 const encodeWAV = (audioBuffer: AudioBuffer): Blob => {
   const numChannels = audioBuffer.numberOfChannels;
   const sampleRate = audioBuffer.sampleRate;
-  const format = 1;
   const bitDepth = 16;
 
   const result = new Float32Array(audioBuffer.length * numChannels);
   if (numChannels === 2) {
     const left = audioBuffer.getChannelData(0);
     const right = audioBuffer.getChannelData(1);
-    for (let i = 0; i < audioBuffer.length; i++) {
+    for (let i = 0; i < audioBuffer.length; i += 1) {
       result[i * 2] = left[i];
       result[i * 2 + 1] = right[i];
     }
@@ -24,9 +22,10 @@ const encodeWAV = (audioBuffer: AudioBuffer): Blob => {
   const dataLength = result.length * (bitDepth / 8);
   const bufferLength = 44 + dataLength;
   const dataView = new DataView(new ArrayBuffer(bufferLength));
-  const writeString = (view: DataView, offset: number, string: string) => {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i));
+
+  const writeString = (view: DataView, offset: number, value: string) => {
+    for (let i = 0; i < value.length; i += 1) {
+      view.setUint8(offset + i, value.charCodeAt(i));
     }
   };
 
@@ -35,7 +34,7 @@ const encodeWAV = (audioBuffer: AudioBuffer): Blob => {
   writeString(dataView, 8, "WAVE");
   writeString(dataView, 12, "fmt ");
   dataView.setUint32(16, 16, true);
-  dataView.setUint16(20, format, true);
+  dataView.setUint16(20, 1, true);
   dataView.setUint16(22, numChannels, true);
   dataView.setUint32(24, sampleRate, true);
   dataView.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
@@ -45,38 +44,89 @@ const encodeWAV = (audioBuffer: AudioBuffer): Blob => {
   dataView.setUint32(40, dataLength, true);
 
   let offset = 44;
-  for (let i = 0; i < result.length; i++, offset += 2) {
-    let s = Math.max(-1, Math.min(1, result[i]));
-    dataView.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  for (let i = 0; i < result.length; i += 1, offset += 2) {
+    const sample = Math.max(-1, Math.min(1, result[i]));
+    dataView.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
   }
 
   return new Blob([dataView], { type: "audio/wav" });
 };
 
-interface AudioRecorderOptions {
+type RecorderOptions = {
   patientId: string;
   nurseId: string;
   shiftId: string;
-  onSuccess?: (data: any) => void;
-  onError?: (err: any) => void;
-}
+  prescriptionContext?: string;
+  sttLanguage?: string;
+  onSuccess?: (data: CreateLogResponse) => void;
+  onError?: (err: unknown) => void;
+};
 
 export function useAudioRecorder({
   patientId,
   nurseId,
   shiftId,
+  prescriptionContext,
+  sttLanguage = "en",
   onSuccess,
   onError,
-}: AudioRecorderOptions) {
+}: RecorderOptions) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [lastResult, setLastResult] = useState<CreateLogResponse | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const durationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isRecordingRef = useRef(false);
+
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  const cleanupAudioNodes = useCallback(async () => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
+    try {
+      sourceRef.current?.disconnect();
+    } catch {
+      // no-op
+    }
+
+    try {
+      analyserRef.current?.disconnect();
+    } catch {
+      // no-op
+    }
+
+    sourceRef.current = null;
+    analyserRef.current = null;
+    setAudioLevel(0);
+
+    if (audioContextRef.current) {
+      await audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    if (durationTimerRef.current) {
+      clearInterval(durationTimerRef.current);
+      durationTimerRef.current = null;
+    }
+  }, []);
+
+  const cleanupStream = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  }, []);
 
   const pickMimeType = (): string => {
     const candidates = [
@@ -85,80 +135,142 @@ export function useAudioRecorder({
       "audio/ogg;codecs=opus",
       "audio/mp4",
     ];
-    for (const mt of candidates) {
-      if (MediaRecorder.isTypeSupported(mt)) return mt;
+
+    for (const mimeType of candidates) {
+      if (MediaRecorder.isTypeSupported(mimeType)) return mimeType;
     }
     return "";
   };
 
-  const sendToBackend = async (wavBlob: Blob) => {
-    setIsProcessing(true);
-    try {
-      const formData = new FormData();
-      formData.append("audio", wavBlob, "recording.wav");
-      formData.append("patient_id", patientId);
-      formData.append("nurse_id", nurseId);
-      formData.append("shift_id", shiftId);
-      formData.append("prescription_context", "none");
+  const setupAudioLevelMeter = useCallback(async (stream: MediaStream) => {
+    const BrowserAudioContext =
+      window.AudioContext ||
+      (window as Window & { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
 
-      const { data } = await axios.post(
-        `${BASE_URL}/api/logs/create`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+    if (!BrowserAudioContext) return;
 
-      console.log("✅ Log saved:", data);
-      onSuccess?.(data);
-    } catch (err) {
-      console.error("❌ Failed to send log:", err);
-      onError?.(err);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+    const audioContext = new BrowserAudioContext();
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.85;
+
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+
+    audioContextRef.current = audioContext;
+    analyserRef.current = analyser;
+    sourceRef.current = source;
+
+    const buffer = new Uint8Array(analyser.frequencyBinCount);
+
+    const tick = () => {
+      const currentAnalyser = analyserRef.current;
+      if (!currentAnalyser || !isRecordingRef.current) {
+        setAudioLevel(0);
+        return;
+      }
+
+      currentAnalyser.getByteTimeDomainData(buffer);
+      let sumSquares = 0;
+      for (let i = 0; i < buffer.length; i += 1) {
+        const normalized = (buffer[i] - 128) / 128;
+        sumSquares += normalized * normalized;
+      }
+
+      const rms = Math.sqrt(sumSquares / buffer.length);
+      const level = Math.min(1, Math.max(0, rms * 4));
+      setAudioLevel(level);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  const sendToBackend = useCallback(
+    async (wavBlob: Blob) => {
+      setIsProcessing(true);
+      try {
+        const lang = sttLanguage === "hi" ? "hi" : "en";
+        const data = await createLogFromAudio({
+          audio: wavBlob,
+          patientId,
+          nurseId,
+          shiftId,
+          prescriptionContext,
+          sttProvider: lang === "hi" ? "sarvam" : "whisper",
+          sttLanguage: lang,
+        });
+
+        setLastResult(data);
+        onSuccess?.(data);
+      } catch (err) {
+        onError?.(err);
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [nurseId, onError, onSuccess, patientId, prescriptionContext, shiftId, sttLanguage],
+  );
 
   const startRecording = useCallback(async () => {
     if (isRecordingRef.current) return;
+    if (!patientId || !nurseId || !shiftId) {
+      onError?.(new Error("Patient, nurse, and shift are required before recording."));
+      return;
+    }
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
+      await setupAudioLevelMeter(stream);
+
       const mimeType = pickMimeType();
       const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
-      const mediaRecorder = new MediaRecorder(stream, options);
-      mediaRecorderRef.current = mediaRecorder;
+      const recorder = new MediaRecorder(stream, options);
+
+      mediaRecorderRef.current = recorder;
       audioChunksRef.current = [];
 
-      mediaRecorder.ondataavailable = (event) => {
+      recorder.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
-      // ← fires the moment stop is called
-      mediaRecorder.onstop = async () => {
-        const finalMime = mediaRecorder.mimeType || "audio/webm";
+      recorder.onstop = async () => {
+        const finalMime = recorder.mimeType || "audio/webm";
         const rawAudioBlob = new Blob(audioChunksRef.current, { type: finalMime });
 
         if (rawAudioBlob.size > 0) {
           try {
             const arrayBuffer = await rawAudioBlob.arrayBuffer();
-            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            const browserAudioContext =
+              window.AudioContext ||
+              (window as Window & { webkitAudioContext?: typeof AudioContext })
+                .webkitAudioContext;
+
+            if (!browserAudioContext) {
+              throw new Error("AudioContext is not supported in this browser.");
+            }
+
+            const decodeCtx = new browserAudioContext();
+            const audioBuffer = await decodeCtx.decodeAudioData(arrayBuffer);
             const wavBlob = encodeWAV(audioBuffer);
-            await sendToBackend(wavBlob);  // ← fires immediately on stop
+            await decodeCtx.close();
+
+            await sendToBackend(wavBlob);
           } catch (err) {
-            console.error("Audio processing error:", err);
             onError?.(err);
           }
         }
 
-        streamRef.current?.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
+        cleanupStream();
+        await cleanupAudioNodes();
       };
 
-      mediaRecorder.start(1000);
+      recorder.start(250);
       isRecordingRef.current = true;
       setIsRecording(true);
       setRecordingDuration(0);
@@ -166,35 +278,64 @@ export function useAudioRecorder({
       durationTimerRef.current = setInterval(() => {
         setRecordingDuration((prev) => prev + 1);
       }, 1000);
-
-    } catch (error) {
-      console.error("Mic access denied:", error);
-      alert("Microphone access denied. Please allow microphone permissions.");
+    } catch (err) {
+      onError?.(err);
     }
-  }, [patientId, nurseId, shiftId]);
+  }, [
+    cleanupAudioNodes,
+    cleanupStream,
+    nurseId,
+    onError,
+    patientId,
+    sendToBackend,
+    setupAudioLevelMeter,
+    shiftId,
+  ]);
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && isRecordingRef.current) {
-      mediaRecorderRef.current.stop();  // ← triggers onstop → sendToBackend
-      isRecordingRef.current = false;
-      setIsRecording(false);
+    if (!isRecordingRef.current) return;
 
-      if (durationTimerRef.current) {
-        clearInterval(durationTimerRef.current);
-        durationTimerRef.current = null;
-      }
+    isRecordingRef.current = false;
+    setIsRecording(false);
+    stopTimer();
+
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state !== "inactive") {
+      recorder.stop();
+      return;
     }
-  }, []);
+
+    cleanupStream();
+    void cleanupAudioNodes();
+  }, [cleanupAudioNodes, cleanupStream, stopTimer]);
 
   const toggleRecording = useCallback(() => {
-    if (isRecordingRef.current) stopRecording();
-    else startRecording();
+    if (isRecordingRef.current) {
+      stopRecording();
+    } else {
+      void startRecording();
+    }
   }, [startRecording, stopRecording]);
+
+  const resetLastResult = useCallback(() => {
+    setLastResult(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopTimer();
+      cleanupStream();
+      void cleanupAudioNodes();
+    };
+  }, [cleanupAudioNodes, cleanupStream, stopTimer]);
 
   return {
     isRecording,
-    isProcessing,  // ← use this to show spinner while backend processes
+    isProcessing,
     recordingDuration,
+    audioLevel,
+    lastResult,
+    resetLastResult,
     startRecording,
     stopRecording,
     toggleRecording,

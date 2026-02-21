@@ -1,46 +1,30 @@
-import { useState } from "react";
-import { Bell, Brain, Mic, Search, TrendingUp, TriangleAlert, ChevronDown } from "lucide-react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { useAudioRecorder } from "./AudioRecorder";
-import { useAppState } from "./state/AppStateContext";
+import { Bell, Brain, ChevronDown, Mic, Search, TrendingUp } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PatientSelector from "./PatientSelector";
-
-interface Patient {
-  id: string;
-  name: string;
-  ward: string;
-}
+import { deriveEntityChips } from "./api/mappers";
+import { useAppState } from "./state/AppStateContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { tasks } = useAppState();
-  const { shiftId, nurseId } = useOutletContext<{ shiftId: string; nurseId: string }>();
+  const {
+    tasks,
+    selectedPatient,
+    setSelectedPatient,
+    latestVoiceLog,
+    prescriptionContext,
+  } = useAppState();
 
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [showSelector, setShowSelector] = useState(false);
 
-  const { isRecording, isProcessing, recordingDuration, toggleRecording } =
-    useAudioRecorder({
-      patientId: selectedPatient?.id || "",
-      nurseId: nurseId,
-      shiftId: shiftId,
-      onSuccess: (data) => {
-        console.log("✅ Transcript:", data.clean_transcript);
-        console.log("💊 Structured:", data.structured_log);
-      },
-      onError: (err) => console.error("❌ Log failed:", err),
-    });
-
-  const openTasks = tasks.filter((t) => !t.completed).length;
-
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const secs = (seconds % 60).toString().padStart(2, "0");
-    return `${mins}:${secs}`;
-  };
+  const openTasks = tasks.filter((task) => !task.completed).length;
+  const entityChips = useMemo(
+    () => deriveEntityChips(latestVoiceLog?.structuredLog ?? null),
+    [latestVoiceLog],
+  );
 
   return (
-    <div className="screen-wrapper text-slate-900" style={{ background: "#eef4f5" }}>
+    <div className="screen-wrapper text-slate-900" style={{ background: "#e9f2f3" }}>
       <header className="screen-header sticky top-0 z-10 py-1" style={{ backdropFilter: "blur(10px)" }}>
         <div>
           <p className="screen-subtitle">Evening Shift • ICU</p>
@@ -57,7 +41,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="flex flex-col gap-4 pb-32">
+      <main className="flex flex-col gap-4 pb-36">
         <section className="grid grid-cols-3 gap-3">
           <article className="card p-4">
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Patients</p>
@@ -80,13 +64,12 @@ export default function Dashboard() {
           </article>
         </section>
 
-        {/* patient selector */}
         <section className="card p-5">
           <p className="section-title mb-3">Select Patient</p>
           <button
             type="button"
-            onClick={() => setShowSelector(!showSelector)}
-            className="w-full flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
+            onClick={() => setShowSelector((prev) => !prev)}
+            className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
           >
             <span className="font-bold text-slate-800">
               {selectedPatient ? selectedPatient.name : "Tap to select patient"}
@@ -101,8 +84,8 @@ export default function Dashboard() {
             <div className="mt-3">
               <PatientSelector
                 selectedId={selectedPatient?.id}
-                onSelect={(p) => {
-                  setSelectedPatient(p);
+                onSelect={(patient) => {
+                  setSelectedPatient(patient);
                   setShowSelector(false);
                 }}
               />
@@ -110,18 +93,59 @@ export default function Dashboard() {
           )}
         </section>
 
-        {selectedPatient && (
+        <section className="dashboard-hero card p-6 text-center">
+          <p className="section-title">Voice Log Center</p>
+          <p className="mt-2 text-lg font-semibold text-slate-700">
+            {selectedPatient
+              ? `Ready for ${selectedPatient.name} (${selectedPatient.ward})`
+              : "Select a patient to begin"}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => navigate("/voice-log")}
+            disabled={!selectedPatient}
+            className="hero-mic-button mt-6"
+          >
+            <Mic size={58} strokeWidth={2.4} />
+          </button>
+
+          <p className="mt-4 text-base font-black uppercase tracking-[0.16em] text-teal-700">
+            {selectedPatient ? "Tap to start recording" : "Patient selection required"}
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            Prescription context: {prescriptionContext === "none" ? "Not attached" : "Attached"}
+          </p>
+        </section>
+
+        {latestVoiceLog && (
           <section className="card p-5">
-            <p className="section-title">Selected Patient</p>
-            <div className="mt-3 flex items-start justify-between gap-4">
+            <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-xl font-extrabold text-slate-900">{selectedPatient.name}</h3>
-                <p className="mt-1 text-sm font-medium text-slate-500">{selectedPatient.ward}</p>
+                <p className="section-title">Latest Structured Log</p>
+                <p className="mt-1 text-sm font-semibold text-slate-600">{latestVoiceLog.updatedAt}</p>
               </div>
-              <span className="rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-emerald-700">
-                Stable
-              </span>
+              {latestVoiceLog.needsReview && (
+                <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-700">
+                  Needs Review
+                </span>
+              )}
             </div>
+            <p className="line-clamp-3 text-sm leading-relaxed text-slate-700">
+              {latestVoiceLog.transcript}
+            </p>
+            {entityChips.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {entityChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700"
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
@@ -153,39 +177,6 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
-
-      {/* record button */}
-      <div className="fixed bottom-[104px] z-30 flex flex-col items-center gap-2 left-1/2 -translate-x-1/2">
-        {isProcessing && (
-          <div className="rounded-full bg-blue-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-            Processing...
-          </div>
-        )}
-        {isRecording && !isProcessing && (
-          <div className="rounded-full bg-rose-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-            Recording {formatDuration(recordingDuration)}
-          </div>
-        )}
-        {!selectedPatient && !isRecording && (
-          <div className="rounded-full bg-amber-400 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-            Select a patient first
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={toggleRecording}
-          disabled={isProcessing || !selectedPatient}
-          className="h-[60px] w-[60px] rounded-full text-white shadow-xl transition-all disabled:opacity-40"
-          style={{
-            background: isRecording ? "#ef4444" : "#0d9488",
-            boxShadow: isRecording
-              ? "0 0 0 4px rgba(239,68,68,0.25)"
-              : "0 8px 24px rgba(13,148,136,0.35)",
-          }}
-        >
-          <Mic size={26} strokeWidth={2.5} className="mx-auto" />
-        </button>
-      </div>
     </div>
   );
 }

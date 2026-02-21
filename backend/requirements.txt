@@ -46,3 +46,4 @@ langchain
 langgraph
 elevenlabs
 whisper
+sarvamai

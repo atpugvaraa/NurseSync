@@ -12,12 +12,23 @@ async def create_log_from_audio(
     patient_id: str = Form(...),
     nurse_id: str = Form(...),
     shift_id: str = Form(...),
-    prescription_context: str = Form(default="none")
+    prescription_context: str = Form(default="none"),
+    stt_provider: str = Form(default="whisper"),
+    stt_language: str = Form(default="en"),
+    stt_mode: str = Form(default="transcribe"),
+    stt_model: str = Form(default="saaras:v3"),
 ):
     audio_bytes = await audio.read()
 
     # step 1: whisper → raw transcript
-    stt_result = await transcribe_audio(audio_bytes, audio.filename)
+    stt_result = await transcribe_audio(
+        audio_bytes,
+        audio.filename,
+        stt_provider=stt_provider,
+        language_hint=stt_language,
+        stt_mode=stt_mode,
+        stt_model=stt_model,
+    )
     raw_transcript = stt_result["transcript"]
     confidence = stt_result["confidence"]
 
@@ -45,11 +56,13 @@ async def create_log_from_audio(
         "confidence": confidence,
         "needs_review": needs_review,
         "structured_log": structured,
-        "saved": saved
+        "saved": saved,
+        "stt_provider": stt_result.get("provider", stt_provider),
+        "stt_detected_language": stt_result.get("language", stt_language),
+        "stt_requested_language": stt_language,
     }
     
 @router.get("/patient/{patient_id}")
 async def get_patient_logs(patient_id: str):
     logs = await get_logs(patient_id)
     return {"logs": logs, "count": len(logs)}
-
