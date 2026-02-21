@@ -1,0 +1,48 @@
+# NurseSync Backend Dependencies
+
+# Web Framework
+fastapi
+uvicorn[standard]
+
+# Audio / STT
+openai-whisper
+openai
+
+# File handling
+python-multipart
+aiofiles
+
+# Database
+supabase
+sqlalchemy
+asyncpg
+
+# PDF & Image parsing (prescriptions/reports)
+pypdf2
+pillow
+pytesseract
+
+# HTTP client
+httpx
+
+# Environment
+python-dotenv
+
+# Audio processing
+pydub
+soundfile
+
+# Validation
+pydantic
+pydantic-settings
+
+# CORS
+starlette
+
+google-genai
+langchain-google-genai
+crewai
+langchain
+langgraph
+elevenlabs
+whisper
