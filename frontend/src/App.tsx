@@ -1,20 +1,24 @@
 import { useState } from "react";
-import Dashboard from "./Dashboard";
-import HandoffScreen from "./HandoffScreen";
+import { Outlet } from "react-router-dom";
+import RouteSwitcherSheet from "./components/RouterSwitcherSheet.tsx";
+import UniversalBottomNav from "./components/UniversalBottomNav.tsx";
 import "./App.css";
 
-type Screen = "dashboard" | "handoff";
-
-function App() {
-  const [screen, setScreen] = useState<Screen>("dashboard");
-
-  if (screen === "handoff") {
-    return <HandoffScreen onBack={() => setScreen("dashboard")} />;
-  }
+function AppShell() {
+  const [switcherOpen, setSwitcherOpen] = useState(false);
 
   return (
-    <Dashboard onNavigateToHandoff={() => setScreen("handoff")} />
+    <div className="app-shell">
+      <div className="app-content">
+        <Outlet />
+      </div>
+      <UniversalBottomNav onOpenRouteSwitcher={() => setSwitcherOpen(true)} />
+      <RouteSwitcherSheet
+        open={switcherOpen}
+        onClose={() => setSwitcherOpen(false)}
+      />
+    </div>
   );
 }
 
-export default App;
+export default AppShell;
