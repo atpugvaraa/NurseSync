@@ -46,3 +46,18 @@ History: {history}
 Nurse asks: {message}"""
     response = MODEL.invoke([HumanMessage(content=prompt)])
     return response.content
+
+async def clean_transcript(raw_transcript: str) -> str:
+    prompt = f"""You are a medical transcription corrector for nurses.
+Fix spelling, grammar, and especially medical terms like:
+- medication names (paracetamol, ibuprofen, amoxicillin etc.)
+- dosages (10mg, 500mg etc.)
+- medical procedures (dressing, IV, catheter etc.)
+- patient names
+
+Return ONLY the corrected transcript text, nothing else, no explanation.
+
+Raw transcript: {raw_transcript}"""
+    
+    response = MODEL.invoke([HumanMessage(content=prompt)])
+    return response.content.strip()

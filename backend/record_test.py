@@ -44,11 +44,12 @@ def send_to_api(file_path):
             data={
                 "patient_id": "a0000000-0000-0000-0000-000000000001",
                 "nurse_id": "b0000000-0000-0000-0000-000000000001",
+                "shift_id": "2e2c87c4-6984-4086-b9ca-d6a87a59bb34",
                 "prescription_context": "none"
             }
         )
     print(f"Status code: {response.status_code}")
-    print(f"Raw response: {response.text}")  # ← add this
+    print(f"Raw response: {response.text}")
     return response.json()
 
 if __name__ == "__main__":

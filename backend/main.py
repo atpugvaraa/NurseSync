@@ -9,7 +9,7 @@ app = FastAPI(title="NurseSync API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:1420", "http://localhost:3000", "*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

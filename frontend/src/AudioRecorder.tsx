@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import axios from "axios";
 
 // the magic 20%: manually writing the wav file headers byte-by-byte
 const encodeWAV = (audioBuffer: AudioBuffer): Blob => {
@@ -111,42 +112,42 @@ export function useAudioRecorder() {
 
         if (rawAudioBlob.size > 0) {
           try {
-            // decode the raw browser blob into raw pcm audio data
             const arrayBuffer = await rawAudioBlob.arrayBuffer();
             const audioContext = new (
               window.AudioContext || (window as any).webkitAudioContext
             )();
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-            // convert it straight to wav using our manual bit-level function
             const wavBlob = encodeWAV(audioBuffer);
-            console.log("wav conversion successful bruv");
 
-            // --- THE NEW DOWNLOAD LOGIC ---
-            // create a temporary url pointing to the wav file in memory
-            const url = URL.createObjectURL(wavBlob);
+            // ── SEND TO BACKEND ──────────────────────────────
+            const formData = new FormData();
+            formData.append("audio", wavBlob, "recording.wav");
+            formData.append(
+              "patient_id",
+              "a0000000-0000-0000-0000-000000000001",
+            );
+            formData.append("nurse_id", "b0000000-0000-0000-0000-000000000001");
+            formData.append("shift_id", "YOUR_SHIFT_UUID_HERE");
+            formData.append("prescription_context", "none");
 
-            // create an invisible anchor tag
-            const a = document.createElement("a");
-            a.style.display = "none";
-            a.href = url;
+            const { data } = await axios.post(
+              "http://localhost:8000/api/logs/create",
+              formData,
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+              },
+            );
 
-            // give the file a dynamic name with a timestamp so they don't overwrite
-            a.download = `nursesync_log_${Date.now()}.wav`;
-
-            // append, click, and instantly clean up
-            document.body.appendChild(a);
-            a.click();
-
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            // ------------------------------
+            console.log("✅ Log saved:", data);
+            console.log("📝 Raw transcript:", data.raw_transcript);
+            console.log("🧹 Clean transcript:", data.clean_transcript);
+            console.log("💊 Structured log:", data.structured_log);
+            // ─────────────────────────────────────────────────
           } catch (err) {
-            console.error("failed to decode, encode, or download audio:", err);
+            console.error("failed to process audio:", err);
           }
         }
 
-        // Release mic (kill the indicator light)
         streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
       };

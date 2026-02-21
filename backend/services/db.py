@@ -15,7 +15,8 @@ async def save_log(
     raw_text: str,
     structured_log: dict,
     confidence: float,
-    needs_review: bool
+    needs_review: bool,
+    shift_id: str
 ) -> dict:
     result = supabase.table("logs").insert({
         "patient_id": patient_id,
@@ -23,7 +24,8 @@ async def save_log(
         "raw_text": raw_text,
         "structured_log": structured_log,
         "confidence": confidence,
-        "needs_review": needs_review
+        "needs_review": needs_review,
+        "shift_id": shift_id
     }).execute()
     return result.data[0]
 
