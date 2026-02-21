@@ -82,3 +82,18 @@ async def accept_handoff(handoff_id: str, incoming_nurse_id: str):
         "incoming_nurse_id": incoming_nurse_id,
         "status": "accepted"
     }).eq("id", handoff_id).execute()
+    
+async def get_all_patients() -> list:
+    result = supabase.table("patients")\
+        .select("*")\
+        .order("name", desc=False)\
+        .execute()
+    return result.data
+
+async def get_patient_by_id(patient_id: str) -> dict:
+    result = supabase.table("patients")\
+        .select("*")\
+        .eq("id", patient_id)\
+        .single()\
+        .execute()
+    return result.data
