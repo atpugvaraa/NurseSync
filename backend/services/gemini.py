@@ -31,9 +31,25 @@ async def extract_log(transcript: str, prescription: str = "none") -> dict:
     return json.loads(text)
 
 async def generate_handoff(logs: list) -> dict:
-    prompt = f"""Summarize this nurse shift for handoff. Return ONLY valid JSON.
-{{"summary": "text", "pending_tasks": [], "high_priority": []}}
-Logs: {json.dumps(logs)}"""
+    prompt = f"""You are a senior clinical nurse summarizing a shift for handoff.
+Given these nurse logs, write a clear, professional handoff summary.
+
+Rules:
+- Summary should be 2-3 sentences, written like a real nurse handoff
+- Extract genuinely pending/incomplete tasks only
+- High priority = anything overdue, missed, or flagged urgent
+- Be specific — include patient names, medications, doses
+
+Return ONLY valid JSON, no markdown:
+{{
+  "summary": "Professional 2-3 sentence shift summary here",
+  "pending_tasks": ["specific task 1", "specific task 2"],
+  "high_priority": ["urgent item 1", "urgent item 2"]
+}}
+
+Shift logs:
+{json.dumps(logs, indent=2)}"""
+
     response = MODEL.invoke([HumanMessage(content=prompt)])
     text = response.content.strip().replace("```json", "").replace("```", "")
     return json.loads(text)

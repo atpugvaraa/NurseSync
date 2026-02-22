@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form
-from services.db import save_prescription
+from services.db import save_prescription, get_all_patients, get_patient_by_id
 
 router = APIRouter()
 
@@ -30,6 +30,11 @@ async def upload_prescription(
         "file_url": f"/static/prescriptions/{patient_id}_{file.filename}",
         "saved": saved
     }
+
+@router.get("/")
+async def list_patients():
+    patients = await get_all_patients()
+    return {"patients": patients}
 
 @router.get("/{patient_id}")
 async def get_prescriptions(patient_id: str):

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from services.db import (
     get_logs_by_shift, save_handoff,
     get_pending_handoff, accept_handoff,
-    update_shift_status, start_shift
+    update_shift_status, start_shift, get_last_shift_logs_for_patient
 )
 from services.gemini import generate_handoff
 
@@ -71,4 +71,24 @@ async def accept_incoming_handoff(req: AcceptHandoffRequest):
     return {
         "message": "Handoff accepted, shift started ✅",
         "shift_id": shift["id"]
+    }
+    
+@router.get("/summary/{patient_id}")
+async def get_patient_handoff_summary(patient_id: str):
+    # get logs from last closed shift for this patient
+    logs = await get_last_shift_logs_for_patient(patient_id)
+
+    if not logs:
+        return {"message": "No previous shift logs for this patient"}
+
+    # gemini summarizes
+    summary = await generate_handoff(logs)
+
+    return {
+        "patient_id": patient_id,
+        "total_logs": len(logs),
+        "summary": summary["summary"],
+        "high_priority": summary["high_priority"],
+        "pending_tasks": summary["pending_tasks"],
+        "logs": logs
     }

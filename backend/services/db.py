@@ -112,3 +112,27 @@ async def get_prescriptions_by_patient(patient_id: str):
         .order("created_at", desc=True)\
         .execute()
     return result.data
+
+async def get_last_shift_logs_for_patient(patient_id: str) -> list:
+    # get the last closed shift
+    shift = supabase.table("shifts")\
+        .select("id")\
+        .eq("status", "closed")\
+        .order("created_at", desc=True)\
+        .limit(1)\
+        .execute()
+
+    if not shift.data:
+        return []
+
+    shift_id = shift.data[0]["id"]
+
+    # get all logs for that patient in that shift
+    logs = supabase.table("logs")\
+        .select("*")\
+        .eq("patient_id", patient_id)\
+        .eq("shift_id", shift_id)\
+        .order("created_at", desc=False)\
+        .execute()
+
+    return logs.data
