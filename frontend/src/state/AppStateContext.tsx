@@ -5,78 +5,63 @@ import {
   useMemo,
   useState,
 } from "react";
-
-export type PatientContext = {
-  id: string;
-  name: string;
-  room: string;
-  mrn: string;
-  age: number;
-};
+import type { Patient, StructuredLog } from "../api/types";
 
 export type TaskItem = {
   id: string;
   title: string;
-  room: string;
+  ward: string;
   completed: boolean;
   overdueMinutes: number;
 };
 
 export type VoiceLogEntry = {
   id: string;
+  patientId: string;
+  rawTranscript: string;
+  cleanTranscript: string;
   transcript: string;
   confidence: number;
+  needsReview: boolean;
+  structuredLog: StructuredLog | null;
   updatedAt: string;
 };
 
 export type AppState = {
-  selectedPatient: PatientContext;
-  setSelectedPatient: (patient: PatientContext) => void;
+  selectedPatient: Patient | null;
+  setSelectedPatient: (patient: Patient | null) => void;
   tasks: TaskItem[];
   toggleTask: (id: string) => void;
-  latestVoiceLog: VoiceLogEntry;
+  latestVoiceLog: VoiceLogEntry | null;
   saveVoiceLog: (entry: VoiceLogEntry) => void;
-};
-
-const defaultPatient: PatientContext = {
-  id: "PX-99201",
-  name: "Sarah Jenkins",
-  room: "402-B",
-  mrn: "12345678",
-  age: 65,
+  prescriptionContext: string;
+  setPrescriptionContext: (context: string) => void;
+  clearPrescriptionContext: () => void;
 };
 
 const initialTasks: TaskItem[] = [
   {
     id: "task-1",
     title: "Medication Administration",
-    room: "402-A",
+    ward: "Ward 3",
     completed: false,
     overdueMinutes: 15,
   },
   {
     id: "task-2",
     title: "Post-Op Vital Check",
-    room: "415",
+    ward: "Ward 3",
     completed: false,
     overdueMinutes: 5,
   },
   {
     id: "task-3",
     title: "Respiratory Assessment",
-    room: "402-B",
+    ward: "Ward 2",
     completed: true,
     overdueMinutes: 0,
   },
 ];
-
-const initialVoiceLog: VoiceLogEntry = {
-  id: "log-1",
-  transcript:
-    "Patient presents with mild respiratory distress. Administered 2mg Albuterol at 14:15. BP 128/82. SpO2 steady at 96%.",
-  confidence: 98.4,
-  updatedAt: "14:15",
-};
 
 const AppStateContext = createContext<AppState | undefined>(undefined);
 
@@ -85,11 +70,10 @@ type AppStateProviderProps = {
 };
 
 export function AppStateProvider({ children }: AppStateProviderProps) {
-  const [selectedPatient, setSelectedPatient] =
-    useState<PatientContext>(defaultPatient);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
-  const [latestVoiceLog, setLatestVoiceLog] =
-    useState<VoiceLogEntry>(initialVoiceLog);
+  const [latestVoiceLog, setLatestVoiceLog] = useState<VoiceLogEntry | null>(null);
+  const [prescriptionContext, setPrescriptionContext] = useState<string>("none");
 
   const toggleTask = useCallback((id: string) => {
     setTasks((prev) =>
@@ -111,6 +95,10 @@ export function AppStateProvider({ children }: AppStateProviderProps) {
     setLatestVoiceLog(entry);
   }, []);
 
+  const clearPrescriptionContext = useCallback(() => {
+    setPrescriptionContext("none");
+  }, []);
+
   const value = useMemo(
     () => ({
       selectedPatient,
@@ -119,14 +107,23 @@ export function AppStateProvider({ children }: AppStateProviderProps) {
       toggleTask,
       latestVoiceLog,
       saveVoiceLog,
+      prescriptionContext,
+      setPrescriptionContext,
+      clearPrescriptionContext,
     }),
-    [latestVoiceLog, saveVoiceLog, selectedPatient, tasks, toggleTask],
+    [
+      clearPrescriptionContext,
+      latestVoiceLog,
+      prescriptionContext,
+      saveVoiceLog,
+      selectedPatient,
+      tasks,
+      toggleTask,
+    ],
   );
 
   return (
-    <AppStateContext.Provider value={value}>
-      {children}
-    </AppStateContext.Provider>
+    <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>
   );
 }
 

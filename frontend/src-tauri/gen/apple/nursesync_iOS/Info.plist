@@ -40,7 +40,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>NurseSync needs microphone access to record voice logs for patient handoff notes.</string>
 </dict>
 </plist>

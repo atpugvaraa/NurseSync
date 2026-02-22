@@ -84,24 +84,24 @@ export default function RouteSwitcherSheet({
   }
 
   return (
-    <div className="sheet-backdrop" onClick={onClose} role="presentation">
+    <div className="sheet-backdrop" style={{ backdropFilter: "blur(4px)" }} onClick={onClose} role="presentation">
       <section
         ref={sheetRef}
-        className="sheet-panel"
+        className="sheet-panel glass-panel"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Quick route switcher"
       >
-        <header className="sheet-header">
-          <h2 className="sheet-title">Quick Actions</h2>
+        <header className="sheet-header border-b border-[var(--border-subtle)] pb-4 mb-4">
+          <h2 className="text-[15px] font-bold uppercase tracking-[0.15em] text-[var(--text-muted)]">Quick Actions</h2>
           <button
             type="button"
             onClick={onClose}
-            className="sheet-close"
+            className="h-8 w-8 rounded-full bg-white grid place-items-center shadow-sm border border-[var(--border-subtle)] transition-transform hover:scale-105"
             aria-label="Close route switcher"
           >
-            <X size={18} strokeWidth={2.5} />
+            <X size={16} strokeWidth={2.5} style={{ color: "var(--text-primary)" }} />
           </button>
         </header>
 
@@ -113,24 +113,24 @@ export default function RouteSwitcherSheet({
               <button
                 key={item.path}
                 type="button"
-                className="sheet-list-item"
+                className="sheet-list-item hover:scale-[1.01] transition-transform shadow-sm mb-2 rounded-2xl"
+                style={{ backgroundColor: "var(--bg-glass)", border: "1px solid var(--border-glass)" }}
                 onClick={() => {
                   navigate(item.path);
                   onClose();
                 }}
               >
-                <span className="sheet-icon-wrap">
+                <span className="sheet-icon-wrap shadow-sm border border-[var(--border-subtle)]" style={{ backgroundColor: "white", color: "var(--primary)" }}>
                   {Icon ? (
                     <Icon
                       size={18}
                       strokeWidth={2.3}
-                      className="text-teal-700"
                     />
                   ) : null}
                 </span>
-                <span className="sheet-copy">
-                  <span className="sheet-item-title">{item.label}</span>
-                  <span className="sheet-item-desc">{item.description}</span>
+                <span className="sheet-copy flex flex-col items-start text-left">
+                  <span className="text-[15px] text-[var(--text-primary)] font-bold tracking-tight">{item.label}</span>
+                  <span className="text-[13px] text-[var(--text-muted)] font-medium mt-0.5">{item.description}</span>
                 </span>
               </button>
             );

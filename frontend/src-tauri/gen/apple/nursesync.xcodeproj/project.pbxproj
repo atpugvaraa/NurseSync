@@ -10,7 +10,6 @@
 		03F6B9560997880A51A69A0B /* assets in Resources */ = {isa = PBXBuildFile; fileRef = EC062F99E29F9036F3A64517 /* assets */; };
 		04B484EC9B69756E4661FCB9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 676DB3FD87AB025B8ADE0317 /* CoreGraphics.framework */; };
 		08CD24BB949A31C0F2C72537 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F736638A7BF9690486F1893 /* WebKit.framework */; };
-		39E80503B6563F8CB858C3BF /* libapp.a in Resources */ = {isa = PBXBuildFile; fileRef = 290CEA94ACF3F53A37D69715 /* libapp.a */; };
 		48AD92141485980401D14E25 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1853CE2689C16E1744B6AEA3 /* Security.framework */; };
 		58007D18C3334B2C95E15C3D /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0BDD4E652901DBAF2663118 /* Metal.framework */; };
 		677E3CA87C459B3E1FD5EB07 /* libapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F1D6F0DDD7FBF42B9F388E1 /* libapp.a */; };
@@ -25,7 +24,6 @@
 /* Begin PBXFileReference section */
 		1853CE2689C16E1744B6AEA3 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		25191E547948EF12AFF7E652 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		290CEA94ACF3F53A37D69715 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
 		3B960C04531B17E708F02A10 /* lib.rs */ = {isa = PBXFileReference; path = lib.rs; sourceTree = "<group>"; };
 		3F736638A7BF9690486F1893 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		562FA4CF26631349024C6391 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -100,7 +98,6 @@
 		8B19C6DF83ED60A7BA093C59 /* Externals */ = {
 			isa = PBXGroup;
 			children = (
-				E482EBBDE9CAA5152DD7B993 /* arm64 */,
 			);
 			path = Externals;
 			sourceTree = "<group>";
@@ -138,22 +135,6 @@
 			path = ../../src;
 			sourceTree = "<group>";
 		};
-		D98F600B6B41FB7A95728BBA /* debug */ = {
-			isa = PBXGroup;
-			children = (
-				290CEA94ACF3F53A37D69715 /* libapp.a */,
-			);
-			path = debug;
-			sourceTree = "<group>";
-		};
-		E482EBBDE9CAA5152DD7B993 /* arm64 */ = {
-			isa = PBXGroup;
-			children = (
-				D98F600B6B41FB7A95728BBA /* debug */,
-			);
-			path = arm64;
-			sourceTree = "<group>";
-		};
 		EBF0C24688D4F82320127FDC = {
 			isa = PBXGroup;
 			children = (
@@ -167,13 +148,6 @@
 				9A787E4C339E5D4170F453CE /* Frameworks */,
 				2E54970040311A6077042955 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		"TEMP_0EA8A73E-6C16-48B0-9B09-D4FC4D3D425F" /* x86_64 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = x86_64;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -235,7 +209,6 @@
 				E4B5DD2C4D9FCB864F58A76F /* Assets.xcassets in Resources */,
 				B70F5B769646462FB94E7022 /* LaunchScreen.storyboard in Resources */,
 				03F6B9560997880A51A69A0B /* assets in Resources */,
-				39E80503B6563F8CB858C3BF /* libapp.a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,7 +274,7 @@
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = exceptionallybad.nursesync;
-				PRODUCT_NAME = "nursesync";
+				PRODUCT_NAME = nursesync;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
@@ -332,7 +305,7 @@
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = exceptionallybad.nursesync;
-				PRODUCT_NAME = "nursesync";
+				PRODUCT_NAME = nursesync;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;

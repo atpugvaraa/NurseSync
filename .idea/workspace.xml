@@ -4,7 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="00c95bf1-58de-4a29-972b-4d5d2ba07d73" name="Changes" comment="" />
+    <list default="true" id="00c95bf1-58de-4a29-972b-4d5d2ba07d73" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync_iOS/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync_iOS/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/HandoffScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/HandoffScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/PatientSelector.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/PatientSelector.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/RecordingOrb.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/RecordingOrb.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/RouterSwitcherSheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/RouterSwitcherSheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/StructuredLogCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/StructuredLogCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/UniversalBottomNav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/UniversalBottomNav.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/AiAssistantView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/AiAssistantView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/DischargeSummaryView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/DischargeSummaryView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/PatientTimelineView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/PatientTimelineView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/ScannerView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/ScannerView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/TaskManagerView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/TaskManagerView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/VoiceLogView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/VoiceLogView.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,10 +98,10 @@
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1772967627801" />
-    <option name="spentUsd" value="0.355172" />
+    <option name="spentUsd" value="0.40629977" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="4" />
+    <option name="suspendCountdown" value="0" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
