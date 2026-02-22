@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import axios from "axios";
 import {
   acceptIncomingHandoff,
   endShift,
@@ -18,6 +19,8 @@ import { isPendingHandoff } from "./api/mappers";
 import type { AppOutletContext } from "./App";
 import type { HandoffEndResponse, HandoffRecord } from "./api/types";
 import { useAppState } from "./state/AppStateContext";
+
+const BASE_URL = "http://localhost:8000";
 
 export default function HandoffScreen() {
   const navigate = useNavigate();
@@ -30,6 +33,10 @@ export default function HandoffScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // ← new state for patient summary
+  const [patientSummary, setPatientSummary] = useState<any>(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
 
   const taskPreview = useMemo(() => tasks.slice(0, 3), [tasks]);
 
@@ -54,6 +61,19 @@ export default function HandoffScreen() {
   useEffect(() => {
     void loadIncoming();
   }, []);
+
+  // ← fetch patient summary when selectedPatient changes
+  useEffect(() => {
+    if (!selectedPatient?.id) return;
+
+    setLoadingSummary(true);
+    setPatientSummary(null);
+
+    axios.get(`${BASE_URL}/api/handoff/summary/${selectedPatient.id}`)
+      .then(({ data }) => setPatientSummary(data))
+      .catch((err) => console.error("Summary fetch failed:", err))
+      .finally(() => setLoadingSummary(false));
+  }, [selectedPatient?.id]);
 
   const handleAcceptIncoming = async () => {
     if (!incomingHandoff) return;
@@ -139,17 +159,70 @@ export default function HandoffScreen() {
           </section>
         )}
 
+        {/* patient context + summary */}
         <section className="glass-panel p-5">
           <p className="section-title border-b-0">Current Patient Context</p>
           {selectedPatient ? (
             <>
               <h2 className="mt-2 text-2xl font-bold text-[var(--text-primary)] tracking-tight">{selectedPatient.name}</h2>
               <p className="mt-1 text-sm text-[var(--text-muted)] font-medium">{selectedPatient.ward}</p>
+
+              {/* ← previous shift summary */}
+              {loadingSummary && (
+                <p className="mt-3 text-sm text-[var(--text-muted)]">Loading previous shift summary...</p>
+              )}
+
+              {patientSummary && !loadingSummary && patientSummary.total_logs > 0 && (
+                <div className="mt-4 flex flex-col gap-2">
+                  {/* summary text */}
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-bg)] p-3">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)] mb-2">
+                      Previous Shift Summary
+                    </p>
+                    <p className="text-sm leading-relaxed text-[var(--text-primary)]">
+                      {patientSummary.summary}
+                    </p>
+                    <p className="mt-2 text-[11px] text-[var(--text-soft)]">
+                      {patientSummary.total_logs} logs from last shift
+                    </p>
+                  </div>
+
+                  {/* high priority */}
+                  {patientSummary.high_priority?.length > 0 && (
+                    <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-rose-600 mb-2">
+                        High Priority
+                      </p>
+                      {patientSummary.high_priority.map((item: string, i: number) => (
+                        <p key={i} className="text-sm text-rose-700 font-medium">• {item}</p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* pending tasks */}
+                  {patientSummary.pending_tasks?.length > 0 && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-amber-600 mb-2">
+                        Pending Tasks
+                      </p>
+                      {patientSummary.pending_tasks.map((task: string, i: number) => (
+                        <p key={i} className="text-sm text-amber-700 font-medium">• {task}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {patientSummary && !loadingSummary && patientSummary.total_logs === 0 && (
+                <p className="mt-3 text-sm text-[var(--text-muted)]">No logs from previous shift.</p>
+              )}
             </>
           ) : (
             <p className="mt-3 text-sm font-semibold text-[var(--text-muted)]">No patient selected from dashboard.</p>
           )}
-          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)]">Shift ID: {shiftId || "Not started"}</p>
+          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--text-soft)]">
+            Shift ID: {shiftId || "Not started"}
+          </p>
         </section>
 
         <section className="glass-panel p-5">
@@ -163,7 +236,6 @@ export default function HandoffScreen() {
           ) : incomingHandoff ? (
             <>
               <p className="text-sm leading-relaxed text-[var(--text-primary)]">{incomingHandoff.summary_text}</p>
-
               <div className="mt-4 grid grid-cols-1 gap-2">
                 <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-bg)] p-3">
                   <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">Pending Tasks</p>
@@ -177,7 +249,6 @@ export default function HandoffScreen() {
                     <p className="mt-2 text-sm text-[var(--text-muted)]">No pending tasks.</p>
                   )}
                 </div>
-
                 <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
                   <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-rose-600">High Priority</p>
                   {incomingHandoff.high_priority.length > 0 ? (
@@ -191,7 +262,6 @@ export default function HandoffScreen() {
                   )}
                 </div>
               </div>
-
               <button
                 type="button"
                 onClick={() => void handleAcceptIncoming()}
@@ -212,7 +282,6 @@ export default function HandoffScreen() {
             <ClipboardList size={14} strokeWidth={2.5} style={{ color: "var(--primary)" }} />
             <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-[var(--text-muted)]">Handoff Tasks</p>
           </div>
-
           <div className="space-y-3">
             {taskPreview.map((task) => (
               <button
@@ -252,7 +321,9 @@ export default function HandoffScreen() {
           <section className="glass-panel p-5">
             <div className="flex items-center gap-2" style={{ color: "var(--primary-contrast)" }}>
               <CheckCircle2 size={16} strokeWidth={2.4} />
-              <p className="text-[12px] font-bold uppercase tracking-[0.15em]" style={{ color: "var(--primary-contrast)", marginBottom: 0 }}>Generated Outgoing Summary</p>
+              <p className="text-[12px] font-bold uppercase tracking-[0.15em]" style={{ color: "var(--primary-contrast)", marginBottom: 0 }}>
+                Generated Outgoing Summary
+              </p>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-[var(--text-primary)] font-medium">{outgoingSummary.summary}</p>
             <div className="mt-4 grid grid-cols-1 gap-2">
