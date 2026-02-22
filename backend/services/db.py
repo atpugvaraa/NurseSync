@@ -97,3 +97,18 @@ async def get_patient_by_id(patient_id: str) -> dict:
         .single()\
         .execute()
     return result.data
+async def save_prescription(patient_id: str, file_url: str, filename: str):
+    result = supabase.table("prescriptions").insert({
+        "patient_id": patient_id,
+        "file_url": file_url,
+        "filename": filename
+    }).execute()
+    return result.data[0]
+
+async def get_prescriptions_by_patient(patient_id: str):
+    result = supabase.table("prescriptions")\
+        .select("*")\
+        .eq("patient_id", patient_id)\
+        .order("created_at", desc=True)\
+        .execute()
+    return result.data

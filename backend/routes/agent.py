@@ -1,15 +1,25 @@
 from fastapi import APIRouter
-from services.gemini import chat_agent
-from models.schema import AgentMessage, AgentResponse
-
+from pydantic import BaseModel
+from services.mega_llm import chat_agent
 
 router = APIRouter()
 
-@router.post("/chat", response_model=AgentResponse)
-async def chat(req: AgentMessage):
+class ChatRequest(BaseModel):
+    message: str
+    patient_context: str = "none"
+    conversation_history: list = []
+
+@router.post("/chat")
+async def chat(req: ChatRequest):
     reply = await chat_agent(
         message=req.message,
-        patient_context=req.patient_id or "no patient selected",
+        patient_context=req.patient_context,
         history=req.conversation_history
     )
-    return AgentResponse(reply=reply)
+    return {
+        "reply": reply,
+        "history": req.conversation_history + [
+            {"role": "user", "content": req.message},
+            {"role": "assistant", "content": reply}
+        ]
+    }
