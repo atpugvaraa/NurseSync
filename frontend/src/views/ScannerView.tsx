@@ -56,6 +56,10 @@ export default function ScannerView() {
       setFileName(data.filename);
       setFileUrl(data.file_url);
 
+      console.log(fileName);
+      console.log(fileUrl);
+
+
       // refresh prescription list
       if (selectedPatient?.id) {
         const updated = await axios.get(
