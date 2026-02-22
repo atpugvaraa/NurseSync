@@ -51,22 +51,22 @@ export default function PatientTimelineView() {
 
   if (!selectedPatient) {
     return (
-      <div className="screen-wrapper" style={{ background: "#dce8e6" }}>
+      <div className="screen-wrapper text-[var(--text-primary)] bg-[var(--surface-bg)]">
         <header className="screen-header">
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
-            className="h-10 w-10 rounded-md border border-slate-300 bg-white grid place-items-center text-slate-700"
+            className="h-10 w-10 rounded-full border border-[var(--border-subtle)] bg-white grid place-items-center text-[var(--text-primary)] shadow-sm transition-transform hover:scale-[1.02]"
           >
             <ChevronLeft size={22} strokeWidth={2.5} />
           </button>
           <div className="flex-1 pl-3">
-            <h1 className="screen-title">Patient Care Timeline</h1>
-            <p className="screen-subtitle">Select patient from dashboard</p>
+            <h1 className="screen-title text-[var(--text-primary)] tracking-tight">Patient Care Timeline</h1>
+            <p className="screen-subtitle text-[var(--text-muted)]">Select patient from dashboard</p>
           </div>
         </header>
-        <section className="card p-5">
-          <p className="text-sm text-slate-600">
+        <section className="glass-panel p-5">
+          <p className="text-[14px] font-medium text-[var(--text-muted)]">
             No patient selected. Pick one from the dashboard to view timeline logs.
           </p>
         </section>
@@ -75,65 +75,65 @@ export default function PatientTimelineView() {
   }
 
   return (
-    <div className="screen-wrapper" style={{ background: "#dce8e6" }}>
+    <div className="screen-wrapper text-[var(--text-primary)] bg-[var(--surface-bg)]">
       <header className="screen-header">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="h-10 w-10 rounded-md border border-slate-300 bg-white grid place-items-center text-slate-700"
+          className="h-10 w-10 rounded-full border border-[var(--border-subtle)] bg-white grid place-items-center text-[var(--text-primary)] shadow-sm transition-transform hover:scale-[1.02]"
         >
           <ChevronLeft size={22} strokeWidth={2.5} />
         </button>
         <div className="flex-1 pl-3">
-          <h1 className="screen-title">Patient Care Timeline</h1>
-          <p className="screen-subtitle">{patient?.ward ?? selectedPatient.ward}</p>
+          <h1 className="screen-title text-[var(--text-primary)] tracking-tight">Patient Care Timeline</h1>
+          <p className="screen-subtitle text-[var(--text-muted)]">{patient?.ward ?? selectedPatient.ward}</p>
         </div>
       </header>
 
-      <section className="card overflow-hidden">
-        <div className="h-[180px] bg-gradient-to-br from-teal-700 to-cyan-900" />
-        <div className="p-4">
-          <h2 className="text-4xl font-black text-slate-900">{patient?.name ?? selectedPatient.name}</h2>
-          <p className="mt-2 text-sm text-slate-600">ID #{selectedPatient.id} • {patient?.ward ?? selectedPatient.ward}</p>
+      <section className="glass-panel overflow-hidden border-0">
+        <div className="p-6">
+          <h2 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight drop-shadow-sm">{patient?.name ?? selectedPatient.name}</h2>
+          <p className="mt-2 text-[13px] font-bold text-[var(--text-muted)]">ID #{selectedPatient.id} • {patient?.ward ?? selectedPatient.ward}</p>
         </div>
       </section>
 
-      <section className="mt-4 flex justify-end">
+      <section className="mt-2 flex justify-end px-2">
         <button
           type="button"
           onClick={() => navigate("/voice-log")}
-          className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-4 py-2 text-sm font-bold text-white"
+          className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md"
+          style={{ backgroundColor: "var(--primary)" }}
         >
-          <Mic size={14} strokeWidth={2.4} />
+          <Mic size={16} strokeWidth={2.4} />
           Record New Log
         </button>
       </section>
 
       {loading && (
-        <section className="mt-4 card p-5 text-sm text-slate-500">Loading logs...</section>
+        <section className="mt-5 glass-panel p-5 text-[14px] font-medium text-[var(--text-muted)]">Loading logs...</section>
       )}
 
-      {error && <section className="mt-4 card p-5 text-sm text-rose-600">{error}</section>}
+      {error && <section className="mt-5 glass-panel p-5 text-[14px] font-bold text-rose-600">{error}</section>}
 
       {!loading && !error && logs.length === 0 && (
-        <section className="mt-4 card p-5 text-sm text-slate-500">
+        <section className="mt-5 glass-panel p-5 text-[14px] font-medium text-[var(--text-muted)]">
           No logs found for this patient yet.
         </section>
       )}
 
-      <section className="mt-4 space-y-3 pb-3">
+      <section className="mt-5 space-y-4 pb-3">
         {logs.map((log) => (
-          <article key={log.id} className="space-y-2">
-            <div className="card p-4">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+          <article key={log.id} className="space-y-3">
+            <div className="glass-panel p-5 border border-[var(--border-subtle)] shadow-sm hover:-translate-y-1 transition-transform">
+              <div className="mb-4 flex items-center justify-between gap-2">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]">
                   {new Date(log.created_at).toLocaleString()}
                 </p>
-                <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600">
+                <span className="rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] bg-white border shadow-sm" style={{ color: "var(--primary)", borderColor: "var(--border-subtle)" }}>
                   {Math.round(log.confidence * 100)}% confidence
                 </span>
               </div>
-              <p className="text-sm leading-relaxed text-slate-700">{log.raw_text}</p>
+              <p className="text-[14px] leading-relaxed text-[var(--text-primary)] font-medium">{log.raw_text}</p>
             </div>
             <StructuredLogCard
               structured={log.structured_log}

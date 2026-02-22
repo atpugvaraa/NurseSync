@@ -6,16 +6,19 @@
   <component name="ChangeListManager">
     <list default="true" id="00c95bf1-58de-4a29-972b-4d5d2ba07d73" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/routes/logs.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/logs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/stt.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/stt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync_iOS/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src-tauri/gen/apple/nursesync_iOS/Info.plist" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/AudioRecorder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/AudioRecorder.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/Dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Dashboard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/HandoffScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/HandoffScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/PatientSelector.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/PatientSelector.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/AppStateContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/AppStateContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/RecordingOrb.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/RecordingOrb.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/RouterSwitcherSheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/RouterSwitcherSheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/StructuredLogCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/StructuredLogCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/UniversalBottomNav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/UniversalBottomNav.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/AiAssistantView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/AiAssistantView.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/DischargeSummaryView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/DischargeSummaryView.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/PatientTimelineView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/PatientTimelineView.tsx" afterDir="false" />
@@ -78,7 +81,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "test",
+    "git-widget-placeholder": "main",
     "javascript.preferred.runtime.type.id": "bun",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/aaravgupta/Programming/Rust/nursesync/src",

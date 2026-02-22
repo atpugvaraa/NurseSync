@@ -9,61 +9,65 @@ export default function TaskManagerView() {
   const urgentCount = tasks.filter((task) => !task.completed).length;
 
   return (
-    <div className="screen-wrapper" style={{ background: "#eef4f5" }}>
-      <header className="screen-header">
+    <div className="screen-wrapper text-[var(--text-primary)] bg-[var(--surface-bg)]">
+      <header className="screen-header flex items-center justify-between">
         <div>
-          <h1 className="screen-title">Task Manager</h1>
-          <p className="screen-subtitle">AI Prioritized • Morning Shift</p>
+          <h1 className="text-[20px] font-bold text-[var(--text-primary)] tracking-tight">Task Manager</h1>
+          <p className="screen-subtitle text-[var(--text-muted)] mt-0.5">AI Prioritized • Morning Shift</p>
         </div>
-        <button className="h-11 w-11 rounded-full border border-teal-200 bg-white grid place-items-center text-teal-600">
+        <button className="h-11 w-11 rounded-full border border-[var(--border-subtle)] bg-white grid place-items-center text-[var(--text-primary)] shadow-sm transition-transform hover:scale-[1.02]">
           <Search size={20} strokeWidth={2.4} />
         </button>
       </header>
 
-      <section className="card p-4">
+      <section className="glass-panel p-5">
         <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-2xl border border-teal-100 bg-white px-3 py-3">
-            <p className="text-3xl font-black text-slate-900">{urgentCount}</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-teal-700">Urgent</p>
+          <div className="rounded-[20px] bg-white border px-4 py-4" style={{ borderColor: 'var(--border-subtle)' }}>
+            <p className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">{urgentCount}</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest mt-1" style={{ color: "var(--primary-contrast)" }}>Urgent</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
-            <p className="text-3xl font-black text-slate-600">12</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Today</p>
+          <div className="rounded-[20px] bg-[var(--surface-bg)] border px-4 py-4" style={{ borderColor: 'var(--border-subtle)' }}>
+            <p className="text-3xl font-bold text-[var(--text-muted)] tracking-tight">12</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest mt-1 text-[var(--text-muted)]">Today</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
-            <p className="text-3xl font-black text-slate-600">84%</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Stats</p>
+          <div className="rounded-[20px] bg-[var(--surface-bg)] border px-4 py-4" style={{ borderColor: 'var(--border-subtle)' }}>
+            <p className="text-3xl font-bold text-[var(--text-muted)] tracking-tight">84%</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest mt-1 text-[var(--text-muted)]">Stats</p>
           </div>
         </div>
       </section>
 
-      <p className="mt-4 flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-teal-800">
-        <TriangleAlert size={16} strokeWidth={2.5} />
-        Overdue - High Risk
-      </p>
+      <div className="mt-5 flex items-center gap-2">
+        <TriangleAlert size={18} strokeWidth={2.5} style={{ color: "var(--primary-contrast)" }} />
+        <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+          Overdue - High Risk
+        </p>
+      </div>
 
-      <section className="mt-3 space-y-3">
+      <section className="mt-4 space-y-4 pb-6">
         {tasks.map((task) => (
-          <article key={task.id} className="card border-l-4 border-l-teal-500 p-4">
-            <p className="text-sm font-black text-rose-500">
-              {task.completed ? "Completed" : `${task.overdueMinutes}m Overdue`} • {task.ward.toUpperCase()}
+          <article key={task.id} className="glass-panel border-l-4 p-5 hover:-translate-y-1 transition-transform" style={{ borderLeftColor: task.completed ? "var(--border-subtle)" : "var(--primary)" }}>
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: task.completed ? "var(--text-muted)" : "var(--primary-contrast)" }}>
+              {task.completed ? "Completed" : `${task.overdueMinutes}m Overdue`} • {task.ward}
             </p>
-            <h2 className="mt-1 text-3xl font-black leading-tight text-slate-900">{task.title}</h2>
-            <div className="mt-4 flex gap-2">
+            <h2 className="mt-2 text-xl font-bold leading-tight text-[var(--text-primary)] tracking-tight">{task.title}</h2>
+            <div className="mt-5 flex gap-3">
               <button
                 type="button"
                 onClick={() => toggleTask(task.id)}
-                className="flex items-center gap-2 rounded-full bg-teal-700 px-4 py-2 text-sm font-bold text-white"
+                className="flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-3 text-[14px] font-bold text-white shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md"
+                style={{ backgroundColor: task.completed ? "var(--text-muted)" : "var(--primary)" }}
               >
-                <CircleCheck size={15} strokeWidth={2.5} />
+                <CircleCheck size={18} strokeWidth={2.5} />
                 {task.completed ? "Undo" : "Log Task"}
               </button>
               <button
                 type="button"
                 onClick={() => navigate("/patients")}
-                className="rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-bold text-teal-700"
+                className="flex-1 rounded-full border px-5 py-3 text-[14px] font-bold shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md uppercase tracking-wider bg-white"
+                style={{ borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
               >
-                DETAILS
+                Details
               </button>
             </div>
           </article>

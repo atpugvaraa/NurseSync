@@ -19,7 +19,7 @@ export default function RecordingOrb({
   const midScale = 1 + audioLevel * 0.1;
 
   return (
-    <div className="recording-orb-wrap">
+    <div className={`recording-orb-wrap ${isRecording ? "is-recording" : ""}`}>
       <div
         className={`recording-halo ${isRecording ? "is-active" : ""}`}
         style={{ transform: `scale(${outerScale})` }}
