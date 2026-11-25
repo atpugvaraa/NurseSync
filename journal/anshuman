@@ -1,0 +1,35 @@
+# Anshuman — Development Journal
+
+**Project:** NurseSync  
+**Contribution area:** Voice logging and AI-assisted nursing workflow
+
+## Week 1 — Voice capture foundation
+
+Implemented the recording flow for nursing notes and connected the audio recorder to the note-entry experience. The focus was to make spoken observations quick to capture while retaining a clear recording state for the user.
+
+## Week 2 — Speech-to-text integration
+
+Integrated the speech-to-text service and the transcription API flow. The transcript is returned as editable text rather than being saved automatically, so the nurse can verify clinical information before it becomes part of a record.
+
+## Week 3 — AI assistant workflow
+
+Developed the AI assistant interface and connected it to the backend agent service. The assistant supports contextual help for nursing tasks while keeping the conversation separate from the patient-log write operation.
+
+## Week 4 — Structured voice logs
+
+Added structured log presentation and recording controls, including visual recording feedback. This made the transition from a spoken note to a readable clinical entry easier to follow.
+
+## Week 5 — Integration and polish
+
+Integrated voice logging and AI-assistance screens with the shared application state and navigation. Verified that users can move between the dashboard, voice workflow, and patient context without losing the active workflow.
+
+## Files and modules contributed
+
+- `frontend/src/AudioRecorder.tsx`
+- `frontend/src/components/RecordingOrb.tsx`
+- `frontend/src/components/StructuredLogCard.tsx`
+- `frontend/src/views/VoiceLogView.tsx`
+- `frontend/src/views/AiAssistantView.tsx`
+- `backend/routes/agent.py`
+- `backend/services/stt.py`
+- `backend/services/gemini.py`

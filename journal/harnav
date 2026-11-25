@@ -1,0 +1,35 @@
+# Harnav — Development Journal
+
+**Project:** NurseSync  
+**Contribution area:** Patient workflow, task management, and shift handoff
+
+## Week 1 — Patient selection and dashboard flow
+
+Built the patient-selection and dashboard workflow so nursing staff can enter the application, select the relevant patient, and reach the most important actions with minimal navigation.
+
+## Week 2 — Patient timeline and clinical logs
+
+Implemented the patient timeline experience and connected it to the patient and log APIs. The timeline presents entries in clinical order so staff can quickly understand recent events.
+
+## Week 3 — Task prioritisation
+
+Developed the task-management view to organise nursing work into a clear, actionable list. The UI supports a focused shift workflow rather than treating tasks as unstructured notes.
+
+## Week 4 — Shift handoff
+
+Implemented the handoff interface and its backend route integration. The handoff flow preserves structured patient context so the incoming staff member can continue care with the relevant information available.
+
+## Week 5 — Workflow integration
+
+Connected patient selection, timeline, tasks, and handoff screens through the shared router and application state. Reviewed the end-to-end nursing workflow from patient selection to handoff.
+
+## Files and modules contributed
+
+- `frontend/src/Dashboard.tsx`
+- `frontend/src/PatientSelector.tsx`
+- `frontend/src/HandoffScreen.tsx`
+- `frontend/src/views/PatientTimelineView.tsx`
+- `frontend/src/views/TaskManagerView.tsx`
+- `backend/routes/patients.py`
+- `backend/routes/logs.py`
+- `backend/routes/handoff.py`

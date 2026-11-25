@@ -1,0 +1,39 @@
+# Harshav — Development Journal
+
+**Project:** NurseSync  
+**Contribution area:** Prescription processing, discharge support, and application infrastructure
+
+## Week 1 — Backend setup and data model
+
+Set up the FastAPI backend structure, configuration, and clinical data model used by the application. This established the common foundation for routes, services, and the frontend API client.
+
+## Week 2 — Prescription scanning
+
+Developed the prescription-scanning workflow and its backend route. The feature takes a prescription image through the application flow and presents extracted information for the nurse to review.
+
+## Week 3 — Discharge-summary experience
+
+Implemented the discharge-summary view to present a structured summary for patient transition. The screen is designed to make essential information easy to review before discharge.
+
+## Week 4 — Navigation and shared state
+
+Integrated the application router, shared state context, API client, and response mappers. This gave each feature a consistent way to load and exchange clinical information.
+
+## Week 5 — UI consistency and testing support
+
+Refined the common visual system and connected the remaining prescription and patient-data interfaces. Reviewed the integration between frontend views and backend endpoints to ensure a coherent application experience.
+
+## Files and modules contributed
+
+- `backend/main.py`
+- `backend/config.py`
+- `backend/models/schema.py`
+- `backend/routes/prescription.py`
+- `backend/services/db.py`
+- `frontend/src/views/ScannerView.tsx`
+- `frontend/src/views/DischargeSummaryView.tsx`
+- `frontend/src/api/client.ts`
+- `frontend/src/api/mappers.ts`
+- `frontend/src/state/AppStateContext.tsx`
+- `frontend/src/router.tsx`
+- `frontend/src/App.css`
